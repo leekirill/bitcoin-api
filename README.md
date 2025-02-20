@@ -8,13 +8,18 @@
 
 Сначала клонируйте репозиторий на вашу локальную машину:
 ```
-git clone https://github.com/leekirill/bitcoin-api.git cd bitcoin-api
+git clone https://github.com/leekirill/bitcoin-api.git 
+```
+```
+cd bitcoin-api
 ```
 
 ## 2. Создайте файл конфигурации
 
 Скопируйте файл `.env.example` в `.env`:
-
+```
+cd app
+```
 ```
 cp .env.example .env
 ```
