@@ -1,1 +1,1 @@
-# rate-api
+# bitcoin-api
