@@ -18,7 +18,7 @@ cd bitcoin-api/app
 
 Скопируйте файл `.env.example` в `.env`:
 ```
-cp .env.example .env
+cp /app/.env.example /app/.env
 ```
 
 
