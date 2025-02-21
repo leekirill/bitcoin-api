@@ -11,15 +11,12 @@
 git clone https://github.com/leekirill/bitcoin-api.git 
 ```
 ```
-cd bitcoin-api
+cd bitcoin-api/app
 ```
 
 ## 2. Создайте файл конфигурации
 
 Скопируйте файл `.env.example` в `.env`:
-```
-cd app
-```
 ```
 cp .env.example .env
 ```
