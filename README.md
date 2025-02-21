@@ -27,7 +27,7 @@ cp .env.example .env
 Используйте команду ниже для того, чтобы собрать и запустить контейнеры:
 
 ```
-docker-compose up -d --build
+make build
 ```
 
 
