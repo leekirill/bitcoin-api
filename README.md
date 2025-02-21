@@ -10,6 +10,9 @@
 ```
 git clone https://github.com/leekirill/bitcoin-api.git 
 ```
+```
+cd bitcoin-api
+```
 
 ## 2. Создайте файл конфигурации
 
