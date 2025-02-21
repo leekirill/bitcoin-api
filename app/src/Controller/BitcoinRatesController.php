@@ -66,9 +66,6 @@ class BitcoinRatesController extends AbstractController
                     case '24h':
                         $from = $to->modify('-24 hours');
                         break;
-                    case '7d':
-                        $from = $to->modify('-7 days');
-                        break;
                     default:
                         return $this->json(['error' => 'Invalid range'], 400);
                 }
