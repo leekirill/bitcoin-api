@@ -15,7 +15,7 @@ git clone https://github.com/leekirill/bitcoin-api.git
 
 Скопируйте файл `.env.example` в `.env`:
 ```
-cp /app/.env.example /app/.env
+cp app/.env.example app/.env
 ```
 
 
