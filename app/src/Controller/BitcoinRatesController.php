@@ -99,7 +99,7 @@ class BitcoinRatesController extends AbstractController
         
             return new JsonResponse($formattedResponse);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Unable to fetch rates'], 500);
+            return new JsonResponse(['error' => 'Undefined error'], 500);
         }
     }
     
