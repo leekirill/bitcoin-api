@@ -27,7 +27,7 @@ cp .env.example .env
 Используйте команду ниже для того, чтобы собрать и запустить контейнеры:
 
 ```
-docker-compose up -d --build
+make build
 ```
 
 
@@ -37,7 +37,7 @@ docker-compose up -d --build
 
 После того как контейнеры будут запущены, вы сможете получить доступ к приложению на следующем URL:
 
-[http://localhost:8000](http://localhost:8000)
+[http://localhost:8000](http://localhost:8000/api/rates)
 
 ## 5. Эндпоинты API
 
