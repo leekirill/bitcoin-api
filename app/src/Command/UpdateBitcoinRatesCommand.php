@@ -16,7 +16,6 @@ class UpdateBitcoinRatesCommand extends Command
     private EntityManagerInterface $entityManager;
     private HttpClientInterface $httpClient;
     private string $apiUrl;
-    private bool $running = true;
     private array $currencies = ['usd', 'eur', 'uah'];
 
     public function __construct(EntityManagerInterface $entityManager, HttpClientInterface $httpClient, string $apiUrl)
@@ -29,47 +28,33 @@ class UpdateBitcoinRatesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        declare(ticks = 1);
-        pcntl_signal(SIGTERM, function () {
-            $this->running = false;
-        });
-
-        $intervalSeconds = 300;
-        $output->writeln('Starting Bitcoin rate updater...');
-
-        while ($this->running) {
-            $startTime = microtime(true);
-
-            try {
-                $response = $this->httpClient->request('GET', $this->apiUrl);
-                $data = $response->toArray();
-
-                if (!isset($data['bitcoin'])) {
-                    $output->writeln('Failed to fetch rates.');
-                } else {
-                    $timestamp = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-                    foreach ($this->currencies as $currency) {
-                        if (isset($data['bitcoin'][$currency])) {
-                            $rateEntity = new BitcoinRates();
-                            $rateEntity->setTimestamp($timestamp);
-                            $rateEntity->setCurrency(strtoupper($currency));
-                            $rateEntity->setRate((string)$data['bitcoin'][$currency]);
-                            $this->entityManager->persist($rateEntity);
-                        }
-                    }
-                    $this->entityManager->flush();
-                    $output->writeln(sprintf('Rates updated at %s', $timestamp->format(DATE_ATOM)));
-                }
-            } catch (\Exception $e) {
-                $output->writeln('Error: ' . $e->getMessage());
+        try {
+            $response = $this->httpClient->request('GET', $this->apiUrl);
+            $data = $response->toArray();
+    
+            if (!isset($data['bitcoin'])) {
+                $output->writeln('Failed to fetch rates.');
+                return Command::FAILURE;
             }
-
-            $elapsed = microtime(true) - $startTime;
-            $sleepTime = max(0, $intervalSeconds - $elapsed);
-            usleep((int)($sleepTime * 1_000_000));
+    
+            $timestamp = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+            foreach ($this->currencies as $currency) {
+                if (isset($data['bitcoin'][$currency])) {
+                    $rateEntity = new BitcoinRates();
+                    $rateEntity->setTimestamp($timestamp);
+                    $rateEntity->setCurrency(strtoupper($currency));
+                    $rateEntity->setRate((string)$data['bitcoin'][$currency]);
+                    $this->entityManager->persist($rateEntity);
+                }
+            }
+            $this->entityManager->flush();
+    
+            $output->writeln(sprintf('Rates updated at %s', $timestamp->format(DATE_ATOM)));
+            return Command::SUCCESS;
+        } catch (\Exception $e) {
+            $output->writeln('Error: ' . $e->getMessage());
+            return Command::FAILURE;
         }
-
-        $output->writeln('Bitcoin rate updater stopped.');
-        return Command::SUCCESS;
     }
+    
 }

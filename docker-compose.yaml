@@ -8,7 +8,7 @@ services:
       - "8000:80"
       - "443:443"
     volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./app:/var/www/app
     depends_on:
       - php-fpm
@@ -17,13 +17,12 @@ services:
 
   php-fpm:
     container_name: php_fpm
-    build: ./docker/php
+    build: ./
     volumes:
       - ./app:/var/www/app
     networks:
       - symfony_network
-    command: >
-      sh -c "composer install && php-fpm -D && php /var/www/app/bin/console app:update-rate"
+    command: /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 
 networks:
   symfony_network:
