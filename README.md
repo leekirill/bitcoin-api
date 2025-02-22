@@ -39,13 +39,7 @@ make up
 make down
 ```
 
-## 4. Накатить дамп базы данных
-
-```
-sqlite3 app/var/new_database.db < app/database/dump.sql
-```
-
-## 5. Накатить миграции
+## 4. Накатить миграции
 
 ```
 make bash
@@ -59,13 +53,13 @@ bin/console make:migration
 bin/console doctrine:migrations:migrate
 ```
 
-## 4. Доступ к серверу
+## 5. Доступ к серверу
 
 После того как контейнеры будут запущены, вы сможете получить доступ к приложению на следующем URL:
 
 [http://localhost:8000](http://localhost:8000/api/rates)
 
-## 5. Эндпоинты API
+## 6. Эндпоинты API
 
 Ваше приложение предоставляет следующие эндпоинты API:
 
