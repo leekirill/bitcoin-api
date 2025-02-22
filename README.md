@@ -41,16 +41,13 @@ make down
 
 ## 4. Накатить миграции
 
+
 ```
-make bash
+make migration
 ```
 
 ```
-bin/console make:migration
-```
-
-```
-bin/console doctrine:migrations:migrate
+make migrate
 ```
 
 ## 5. Доступ к серверу
