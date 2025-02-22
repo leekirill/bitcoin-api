@@ -22,7 +22,8 @@ services:
       - ./app:/var/www/app
     networks:
       - symfony_network
-    command: /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+    command: >
+      sh -c "composer install && php-fpm -D && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"
 
 networks:
   symfony_network:

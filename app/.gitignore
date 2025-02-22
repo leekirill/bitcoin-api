@@ -5,6 +5,6 @@
 !.env.example
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
-/var/cache
+/var/
 /vendor/
 ###< symfony/framework-bundle ###
