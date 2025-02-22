@@ -39,13 +39,13 @@ make up
 make down
 ```
 
-## 4. Накатить бд
+## 4. Накатить дамп базы данных
 
 ```
 sqlite3 app/var/new_database.db < app/database/dump.sql
 ```
 
-## 5. 
+## 5. Накатить миграции
 
 ```
 make bash
