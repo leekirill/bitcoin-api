@@ -8,9 +8,11 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[AsCommand(name: 'app:update-rate')]
+#[AsPeriodicTask('1 minute', schedule: 'default')]
 class UpdateBitcoinRatesCommand extends Command
 {
     private EntityManagerInterface $entityManager;

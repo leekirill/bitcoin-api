@@ -25,7 +25,7 @@ class BitcoinRatesController extends AbstractController
     }
 
 
-    #[Route('/api/rates', name: 'get_rate', methods: ['GET'])]
+    #[Route('/api/rates', methods: ['GET'])]
     public function getRate(): JsonResponse
     {
         try {

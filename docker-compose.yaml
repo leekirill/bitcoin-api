@@ -23,7 +23,7 @@ services:
     networks:
       - symfony_network
     command: >
-      sh -c "composer install && php-fpm -D && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf"
+      sh -c "composer install && php-fpm -F"
 
 networks:
   symfony_network:
