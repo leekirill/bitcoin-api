@@ -39,6 +39,26 @@ make up
 make down
 ```
 
+## 4. Накатить бд
+
+```
+sqlite3 app/var/new_database.db < app/database/dump.sql
+```
+
+## 5. 
+
+```
+make bash
+```
+
+```
+bin/console make:migration
+```
+
+```
+bin/console doctrine:migrations:migrate
+```
+
 ## 4. Доступ к серверу
 
 После того как контейнеры будут запущены, вы сможете получить доступ к приложению на следующем URL:
