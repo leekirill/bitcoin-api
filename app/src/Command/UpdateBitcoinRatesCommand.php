@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsCommand(name: 'app:update-rate')]
 #[AsPeriodicTask('1 minute', schedule: 'default')]
@@ -18,18 +19,24 @@ class UpdateBitcoinRatesCommand extends Command
     private EntityManagerInterface $entityManager;
     private HttpClientInterface $httpClient;
     private string $apiUrl;
-    private array $currencies = ['usd', 'eur', 'uah'];
+    private array $currencies;
 
-    public function __construct(EntityManagerInterface $entityManager, HttpClientInterface $httpClient, string $apiUrl)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager, 
+        HttpClientInterface $httpClient,
+        string $apiUrl,
+        string $currencies
+    ) {
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->httpClient = $httpClient;
         $this->apiUrl = $apiUrl;
+        $this->currencies = array_map('strtolower', explode(',', $currencies));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+
         try {
             $response = $this->httpClient->request('GET', $this->apiUrl);
             $data = $response->toArray();

@@ -2,105 +2,71 @@
 
 namespace App\Controller;
 
-use App\Repository\BitcoinRatesRepository;
+use App\Service\BitcoinRatesService;
+use App\Exception\BitcoinRatesException;
+use App\Exception\ErrorMessages;
+use App\DTO\HistoryRequestDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use DateTimeImmutable;
 use DateTimeZone;
 
 class BitcoinRatesController extends AbstractController
 {
-
-    private HttpClientInterface $httpClient;
-    private string $apiUrl;
-
-    public function __construct(HttpClientInterface $httpClient, string $apiUrl)
-    {
-        $this->httpClient = $httpClient;
-        $this->apiUrl = $apiUrl;
-    }
-
+    public function __construct(
+        private readonly BitcoinRatesService $ratesService
+    ) {}
 
     #[Route('/api/rates', methods: ['GET'])]
     public function getRate(): JsonResponse
     {
         try {
-            $response = $this->httpClient->request('GET', $this->apiUrl);
-            $data = $response->toArray();
-    
-            $rates = [];
-            foreach ($data['bitcoin'] as $currency => $rate) {
-                $rates[strtoupper($currency)] = (string) $rate;
-            }
-    
-            $formattedResponse = [
-                'timestamp' => (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format(DATE_ATOM),
-                'rates' => $rates,
-            ];
-    
-            return new JsonResponse($formattedResponse);
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Unable to fetch rates'], 500);
+            $rates = $this->ratesService->getCurrentRates();
+            return new JsonResponse($rates);
+        } catch (BitcoinRatesException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
-    
 
     #[Route('/api/rates/history', methods: ['GET'])]
-    public function history(Request $request, BitcoinRatesRepository $rateRepository): JsonResponse
-    {
+    public function history(
+        Request $request,
+        ValidatorInterface $validator
+    ): JsonResponse {
         try {
-            $range = $request->query->get('range');
-            $from = $request->query->get('from');
-            $to = $request->query->get('to');
-        
-            if ($range) {
-                $to = new DateTimeImmutable('now', new DateTimeZone('UTC'));
-                switch ($range) {
-                    case '1h':
-                        $from = $to->modify('-1 hour');
-                        break;
-                    case '24h':
-                        $from = $to->modify('-24 hours');
-                        break;
-                    default:
-                        return $this->json(['error' => 'Invalid range'], 400);
+            $dto = new HistoryRequestDTO();
+            $dto->range = $request->query->get('range');
+            $dto->from = $request->query->get('from');
+            $dto->to = $request->query->get('to');
+
+            $errors = $validator->validate($dto);
+            if (count($errors) > 0) {
+                $errorMessages = [];
+                foreach ($errors as $error) {
+                    $errorMessages[] = $error->getMessage();
                 }
-            } elseif ($from && $to) {
-                $from = new DateTimeImmutable($from, new DateTimeZone('UTC'));
-                $to = new DateTimeImmutable($to, new DateTimeZone('UTC'));
+                return new JsonResponse(['errors' => $errorMessages], 400);
+            }
+
+            if ($dto->range) {
+                $to = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+                $from = match ($dto->range) {
+                    '1h' => $to->modify('-1 hour'),
+                    '24h' => $to->modify('-24 hours'),
+                    default => throw new Exception(ErrorMessages::INVALID_RANGE),
+                };
             } else {
-                return $this->json(['error' => 'Invalid parameters'], 400);
+                $from = new DateTimeImmutable($dto->from, new DateTimeZone('UTC'));
+                $to = new DateTimeImmutable($dto->to, new DateTimeZone('UTC'));
             }
-        
-            $history = $rateRepository->findHistory($from, $to);
-        
-            $formattedHistory = [];
-            foreach ($history as $rate) {
-                $formattedHistory[$rate->getTimestamp()->format(DATE_ATOM)][$rate->getCurrency()] = $rate->getRate();
-            }
-        
-            $response = [];
-            foreach ($formattedHistory as $timestamp => $rates) {
-                $response[] = [
-                    'timestamp' => $timestamp,
-                    'rates' => $rates
-                ];
-            }
-    
-            $formattedResponse = [
-                'from' => $from->format(DATE_ATOM),
-                'to' => $to->format(DATE_ATOM),
-                'history' => $response
-            ];
-        
-            return new JsonResponse($formattedResponse);
+
+            $result = $this->ratesService->getHistoricalRates($from, $to);
+            return new JsonResponse($result);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Undefined error'], 500);
+            return new JsonResponse(['error' => ErrorMessages::UNDEFINED_ERROR], 500);
         }
     }
-    
 }

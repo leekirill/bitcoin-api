@@ -6,6 +6,8 @@ use App\Repository\BitcoinRatesRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BitcoinRatesRepository::class)]
+#[ORM\Index(columns: ["timestamp"])]
+#[ORM\Index(columns: ["currency"])]
 class BitcoinRates
 {
     #[ORM\Id]
@@ -13,7 +15,7 @@ class BitcoinRates
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'datetime_immutable')]
     private ?\DateTimeImmutable $timestamp = null;
 
     #[ORM\Column(length: 3)]
