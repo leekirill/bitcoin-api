@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsCommand(name: 'app:update-rate')]
 #[AsPeriodicTask('1 minute', schedule: 'default')]

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f422a19c415509fb637f73fb13a9d9d",
+    "content-hash": "0aeef1a2953df70e37967d8cd3c9697f",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -4559,6 +4559,48 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "jetbrains/phpstorm-attributes",
+            "version": "1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/JetBrains/phpstorm-attributes.git",
+                "reference": "64de815a4509c29e00d5e3474087fd24c171afc2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/JetBrains/phpstorm-attributes/zipball/64de815a4509c29e00d5e3474087fd24c171afc2",
+                "reference": "64de815a4509c29e00d5e3474087fd24c171afc2",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "JetBrains\\PhpStorm\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "JetBrains",
+                    "homepage": "https://www.jetbrains.com"
+                }
+            ],
+            "description": "PhpStorm specific attributes",
+            "keywords": [
+                "attributes",
+                "jetbrains",
+                "phpstorm"
+            ],
+            "support": {
+                "issues": "https://youtrack.jetbrains.com/newIssue?project=WI",
+                "source": "https://github.com/JetBrains/phpstorm-attributes/tree/1.2"
+            },
+            "time": "2024-10-11T10:46:19+00:00"
+        },
         {
             "name": "symfony/maker-bundle",
             "version": "v1.62.1",

@@ -27,16 +27,16 @@ class HistoryRequestDTO
     public ?string $to = null;
 
     #[Assert\Callback]
-    public function validateOptionalFields(ExecutionContextInterface $context, $payload)
+    public function validateParameters(ExecutionContextInterface $context)
     {
         if($this->range === null && $this->from === null && $this->to === null) {
-            $context->buildViolation('Please provide either `range=` or `from=&to=` parameters')
+            $context->buildViolation(ErrorMessages::BLANK_ALL)
                 ->addViolation();
             return;
         }
 
         if($this->range !== null && ($this->from !== null || $this->to !== null)) {
-            $context->buildViolation('`range=` and `from=&to=` parameters cannot be used at the same time')
+            $context->buildViolation(ErrorMessages::SAME_TIME)
                 ->addViolation();
             return;
         }
@@ -56,7 +56,7 @@ class HistoryRequestDTO
         }
 
         if ($this->range === null || trim($this->range) === '') {
-            $context->buildViolation('`range=` parameter cannot be empty')
+            $context->buildViolation(ErrorMessages::RANGE['INVALID_RANGE'])
                 ->atPath('range')
                 ->addViolation();
         }

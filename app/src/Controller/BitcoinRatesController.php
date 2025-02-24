@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Service\BitcoinRatesService;
-use App\Exception\BitcoinRatesException;
 use App\Exception\ErrorMessages;
 use App\DTO\HistoryRequestDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +25,7 @@ class BitcoinRatesController extends AbstractController
         try {
             $rates = $this->ratesService->getCurrentRates();
             return new JsonResponse($rates);
-        } catch (BitcoinRatesException $e) {
+        } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
@@ -56,7 +55,7 @@ class BitcoinRatesController extends AbstractController
                 $from = match ($dto->range) {
                     '1h' => $to->modify('-1 hour'),
                     '24h' => $to->modify('-24 hours'),
-                    default => throw new Exception(ErrorMessages::INVALID_RANGE),
+                    default => throw new \Exception(ErrorMessages::INVALID_PARAMETERS),
                 };
             } else {
                 $from = new DateTimeImmutable($dto->from, new DateTimeZone('UTC'));
