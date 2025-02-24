@@ -10,33 +10,27 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[AsCommand(name: 'app:update-rate')]
 #[AsPeriodicTask('1 minute', schedule: 'default')]
 class UpdateBitcoinRatesCommand extends Command
 {
-    private EntityManagerInterface $entityManager;
-    private HttpClientInterface $httpClient;
-    private string $apiUrl;
-    private array $currencies;
+
+    private readonly array $currencies;
 
     public function __construct(
-        EntityManagerInterface $entityManager, 
-        HttpClientInterface $httpClient,
-        string $apiUrl,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly HttpClientInterface $httpClient,
+        private readonly string $apiUrl,
+        private readonly string $timezone,
         string $currencies
     ) {
         parent::__construct();
-        $this->entityManager = $entityManager;
-        $this->httpClient = $httpClient;
-        $this->apiUrl = $apiUrl;
         $this->currencies = array_map('strtolower', explode(',', $currencies));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
         try {
             $response = $this->httpClient->request('GET', $this->apiUrl);
             $data = $response->toArray();
@@ -46,7 +40,7 @@ class UpdateBitcoinRatesCommand extends Command
                 return Command::FAILURE;
             }
     
-            $timestamp = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+            $timestamp = new \DateTimeImmutable('now', new \DateTimeZone($this->timezone));
             foreach ($this->currencies as $currency) {
                 if (isset($data['bitcoin'][$currency])) {
                     $rateEntity = new BitcoinRates();

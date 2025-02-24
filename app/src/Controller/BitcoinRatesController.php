@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Service\BitcoinRatesService;
-use App\Exception\BitcoinRatesException;
 use App\Exception\ErrorMessages;
 use App\DTO\HistoryRequestDTO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,14 +10,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use DateTimeImmutable;
-use DateTimeZone;
 
 class BitcoinRatesController extends AbstractController
 {
     public function __construct(
-        private readonly BitcoinRatesService $ratesService
-    ) {}
+        private readonly BitcoinRatesService $ratesService,
+        private readonly string $timezone
+    ) {} 
 
     #[Route('/api/rates', methods: ['GET'])]
     public function getRate(): JsonResponse
@@ -26,7 +24,7 @@ class BitcoinRatesController extends AbstractController
         try {
             $rates = $this->ratesService->getCurrentRates();
             return new JsonResponse($rates);
-        } catch (BitcoinRatesException $e) {
+        } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 500);
         }
     }
@@ -52,15 +50,15 @@ class BitcoinRatesController extends AbstractController
             }
 
             if ($dto->range) {
-                $to = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+                $to = new \DateTimeImmutable('now', new \DateTimeZone($this->timezone));
                 $from = match ($dto->range) {
                     '1h' => $to->modify('-1 hour'),
                     '24h' => $to->modify('-24 hours'),
-                    default => throw new Exception(ErrorMessages::INVALID_RANGE),
+                    default => throw new \Exception(ErrorMessages::INVALID_PARAMETERS),
                 };
             } else {
-                $from = new DateTimeImmutable($dto->from, new DateTimeZone('UTC'));
-                $to = new DateTimeImmutable($dto->to, new DateTimeZone('UTC'));
+                $from = new \DateTimeImmutable($dto->from, new \DateTimeZone($this->timezone));
+                $to = new \DateTimeImmutable($dto->to, new \DateTimeZone($this->timezone));
             }
 
             $result = $this->ratesService->getHistoricalRates($from, $to);

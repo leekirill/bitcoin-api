@@ -6,6 +6,7 @@
 parameters:
     bitcoin_rates_currencies: '%env(BITCOIN_RATES_CURRENCIES)%'
     bitcoin_rates_api_url: '%env(BITCOIN_RATES_BASE_URL)%?ids=bitcoin&vs_currencies=%bitcoin_rates_currencies%&precision=12'
+    bitcoin_rates_timezone: '%env(BITCOIN_RATES_TIMEZONE)%'
 
 services:
     # default configuration for services in *this* file
@@ -24,7 +25,13 @@ services:
         arguments:
             $apiUrl: '%bitcoin_rates_api_url%'
             $currencies: '%bitcoin_rates_currencies%'
+            $timezone: '%bitcoin_rates_timezone%'
 
     App\Service\BitcoinRatesService:
         arguments:
             $apiUrl: '%bitcoin_rates_api_url%'
+            $timezone: '%bitcoin_rates_timezone%'
+
+    App\Controller\BitcoinRatesController:
+        arguments:
+            $timezone: '%bitcoin_rates_timezone%'

@@ -5,8 +5,6 @@ namespace App\Service;
 use App\Repository\BitcoinRatesRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use DateTimeImmutable;
-use DateTimeZone;
 use JetBrains\PhpStorm\ArrayShape;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Exception;
@@ -18,6 +16,7 @@ class BitcoinRatesService
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
         private readonly string $apiUrl,
+        private readonly string $timezone
     ) {}
 
     #[ArrayShape([
@@ -40,7 +39,7 @@ class BitcoinRatesService
             }
 
             return [
-                'timestamp' => (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format(DATE_ATOM),
+                'timestamp' => (new \DateTimeImmutable('now', new \DateTimeZone($this->timezone)))->format(DATE_ATOM),
                 'rates' => $rates,
             ];
         } catch (Exception $e) {
@@ -58,8 +57,8 @@ class BitcoinRatesService
         'history' => 'array'
     ])]
     public function getHistoricalRates(
-        #[NotNull] DateTimeImmutable $from,
-        #[NotNull] DateTimeImmutable $to
+        #[NotNull] \DateTimeImmutable $from,
+        #[NotNull] \DateTimeImmutable $to
     ): array {
         try {
             $history = $this->repository->findHistory($from, $to);
